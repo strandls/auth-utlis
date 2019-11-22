@@ -80,5 +80,12 @@
 			<version>1.19.4</version>
 		</dependency>
 		
+		<!-- https://mvnrepository.com/artifact/com.google.inject.extensions/guice-servlet -->
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-servlet</artifactId>
+            <version>4.2.2</version>
+        </dependency>
+		
 	</dependencies>
 </project>
