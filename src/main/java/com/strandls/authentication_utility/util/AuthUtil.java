@@ -21,7 +21,7 @@ public class AuthUtil {
 			
 			String token = header.substring("Bearer".length()).trim();
 			JwtAuthenticator authenticator = new JwtAuthenticator();
-			authenticator.addSignatureConfiguration(new SecretSignatureConfiguration(PropertyFileUtil.fetchProperty("config.property", "jwtSalt")));
+			authenticator.addSignatureConfiguration(new SecretSignatureConfiguration(PropertyFileUtil.fetchProperty("config.properties", "jwtSalt")));
 			profile = authenticator.validateToken(token);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage());
