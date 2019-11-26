@@ -1,2 +1,20 @@
-/target
-/settings*
+target/
+build/
+.directory
+.project
+.classpath
+.vscode
+.settings/
+.svn/
+bin/
+# Intellij
+*.ipr
+*.iml
+.idea
+out/
+.DS_Store
+/bootstrap
+/dependencies.xml
+.java-version
+deployOnVenus.sh
+@ci/maven-toolbox
