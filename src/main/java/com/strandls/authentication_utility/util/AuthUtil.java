@@ -32,6 +32,7 @@ public class AuthUtil {
 		try {
 			String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 			if (header == null || !header.startsWith("Bearer ")) {
+				throw new NullPointerException();
 			}
 
 			String token = header.substring("Bearer".length()).trim();
