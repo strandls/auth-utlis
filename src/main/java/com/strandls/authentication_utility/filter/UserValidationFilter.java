@@ -17,10 +17,14 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.jwt.config.signature.SecretSignatureConfiguration;
 import org.pac4j.jwt.credentials.authenticator.JwtAuthenticator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UserValidationFilter implements MethodInterceptor {
 	
-	public static JwtAuthenticator jwtAuthenticator;
+	private static final Logger logger = LoggerFactory.getLogger(UserValidationFilter.class);
+	
+	public static final JwtAuthenticator jwtAuthenticator;
 	public static final String JWT_SALT;
 	
 	static {
@@ -29,7 +33,7 @@ public class UserValidationFilter implements MethodInterceptor {
 		try {
 			properties.load(in);
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		JWT_SALT = properties.getProperty("jwtSalt", "12345678901234567890123456789012");
 		jwtAuthenticator = new JwtAuthenticator();
@@ -49,7 +53,7 @@ public class UserValidationFilter implements MethodInterceptor {
 		
 		// Extract the request out of method using parameter index.
 		HttpServletRequest request = (HttpServletRequest) invocation.getArguments()[parameterIndex];
-		String authorizationHeader = ((HttpServletRequest) request).getHeader(HttpHeaders.AUTHORIZATION);
+		String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 		if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
 			return Response.status(Status.BAD_REQUEST).entity("Missing authorization header in request").build();
 		}

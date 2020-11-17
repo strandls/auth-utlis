@@ -26,6 +26,11 @@ import com.strandls.authentication_utility.model.User;
 public class AuthUtil {
 
 	private static final Logger logger = LoggerFactory.getLogger(AuthUtil.class);
+	
+	private static final String JWT_SALT = "jwtSalt";
+	private static final String CONFIGURATION = "config.properties";
+	
+	private AuthUtil() {}
 
 	public static CommonProfile getProfileFromRequest(HttpServletRequest request) {
 		CommonProfile profile = null;
@@ -38,7 +43,7 @@ public class AuthUtil {
 			String token = header.substring("Bearer".length()).trim();
 			JwtAuthenticator authenticator = new JwtAuthenticator();
 			authenticator.addSignatureConfiguration(
-					new SecretSignatureConfiguration(PropertyFileUtil.fetchProperty("config.properties", "jwtSalt")));
+					new SecretSignatureConfiguration(PropertyFileUtil.fetchProperty(CONFIGURATION, JWT_SALT)));
 			profile = authenticator.validateToken(token);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage());
@@ -47,11 +52,11 @@ public class AuthUtil {
 	}
 
 	public static Map<String, Object> generateToken(User user, boolean refreshToken) {
-		Map<String, Object> response = new HashMap<String, Object>();
+		Map<String, Object> response = new HashMap<>();
 		try {
 			response.putAll(buildTokens(createUserProfile(user), user, refreshToken));
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			logger.error(ex.getMessage());
 		}
 		return response;
 	}
@@ -72,8 +77,9 @@ public class AuthUtil {
 			return createUserProfile(user.getId(), user.getUserName(),
 					(email == null || email.isEmpty()) ? mobile : email, strRoles);
 		} catch (Exception e) {
-			throw e;
+			logger.error(e.getMessage());
 		}
+		return null;
 	}
 
 	public static CommonProfile createUserProfile(Long userId, String username, String email, Set<String> authorities) {
@@ -93,8 +99,8 @@ public class AuthUtil {
 		profile.addAttribute(JwtClaims.EXPIRATION_TIME, JWTUtil.getAccessTokenExpiryDate());
 		profile.addAttribute(JwtClaims.ISSUED_AT, new Date());
 		profile.setRoles(authorities);
-		for (Object authority : authorities) {
-			profile.addRole((String) authority);
+		for (String authority : authorities) {
+			profile.addRole(authority);
 		}
 	}
 
@@ -111,21 +117,21 @@ public class AuthUtil {
 				response.put("refresh_token", refreshToken);
 			}
 		} catch (Exception ex) {
-			throw ex;
+			logger.error(ex.getMessage());
 		}
 		return response;
 	}
 
 	private static String generateAccessToken(CommonProfile profile, User user) {
-		JwtGenerator<CommonProfile> generator = new JwtGenerator<CommonProfile>(
-				new SecretSignatureConfiguration(PropertyFileUtil.fetchProperty("config.properties", "jwtSalt")));
+		JwtGenerator<CommonProfile> generator = new JwtGenerator<>(
+				new SecretSignatureConfiguration(PropertyFileUtil.fetchProperty(CONFIGURATION, JWT_SALT)));
 
-		Set<String> roles = new HashSet<String>();
+		Set<String> roles = new HashSet<>();
 		if (user.getRoles() != null) {
 			user.getRoles().forEach(role -> roles.add(role.getAuthority()));
 		}
 
-		Map<String, Object> jwtClaims = new HashMap<String, Object>();
+		Map<String, Object> jwtClaims = new HashMap<>();
 		jwtClaims.put("id", profile.getId());
 		jwtClaims.put(JwtClaims.SUBJECT, profile.getId() + "");
 		jwtClaims.put(Pac4jConstants.USERNAME, profile.getUsername());
@@ -138,15 +144,15 @@ public class AuthUtil {
 	}
 
 	private static String generateRefreshToken(CommonProfile profile, User user) {
-		JwtGenerator<CommonProfile> generator = new JwtGenerator<CommonProfile>(
-				new SecretSignatureConfiguration(PropertyFileUtil.fetchProperty("config.properties", "jwtSalt")));
+		JwtGenerator<CommonProfile> generator = new JwtGenerator<>(
+				new SecretSignatureConfiguration(PropertyFileUtil.fetchProperty(CONFIGURATION, JWT_SALT)));
 
-		Set<String> roles = new HashSet<String>();
+		Set<String> roles = new HashSet<>();
 		if (user.getRoles() != null) {
 			user.getRoles().forEach(role -> roles.add(role.getAuthority()));
 		}
 
-		Map<String, Object> jwtClaims = new HashMap<String, Object>();
+		Map<String, Object> jwtClaims = new HashMap<>();
 		jwtClaims.put("id", profile.getId());
 		jwtClaims.put(JwtClaims.SUBJECT, profile.getId() + "");
 		jwtClaims.put(Pac4jConstants.USERNAME, profile.getUsername());
