@@ -42,7 +42,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<org.pac4j.version>3.7.0</org.pac4j.version>
+		<org.pac4j.version>5.2.0</org.pac4j.version>
 		<jax-rs-pac4j.version>2.3.0</jax-rs-pac4j.version>
 	</properties>
 
