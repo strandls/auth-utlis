@@ -137,6 +137,7 @@ public class AuthUtil {
 			jwtClaims.put(JwtClaims.SUBJECT, null);
 			jwtClaims.put(Pac4jConstants.USERNAME, null);
 			jwtClaims.put(CommonProfileDefinition.EMAIL, email);
+			jwtClaims.put(JwtClaims.SUBJECT, email + "");
 			jwtClaims.put(JwtClaims.EXPIRATION_TIME, JWTUtil.getRefreshTokenExpiryDate());
 			jwtClaims.put(JwtClaims.ISSUED_AT, new Date());
 			response.put("access_token", generator.generate(jwtClaims));
