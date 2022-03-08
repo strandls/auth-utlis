@@ -127,7 +127,7 @@ public class AuthUtil {
 
 	public static Map<String, Object> generateAccessTokenFromEmail(String email) {
 		Map<String, Object> response = new HashMap<>();
-		if (!email.isEmpty() && email != null) {
+		if ( email != null && !email.isEmpty()) {
 
 			JwtGenerator<CommonProfile> generator = new JwtGenerator<>(
 					new SecretSignatureConfiguration(PropertyFileUtil.fetchProperty(CONFIGURATION, JWT_SALT)));
