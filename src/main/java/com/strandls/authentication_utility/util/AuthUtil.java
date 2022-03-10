@@ -9,6 +9,8 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.profile.CommonProfile;
@@ -26,11 +28,12 @@ import com.strandls.authentication_utility.model.User;
 public class AuthUtil {
 
 	private static final Logger logger = LoggerFactory.getLogger(AuthUtil.class);
-	
+
 	private static final String JWT_SALT = "jwtSalt";
 	private static final String CONFIGURATION = "config.properties";
-	
-	private AuthUtil() {}
+
+	private AuthUtil() {
+	}
 
 	public static CommonProfile getProfileFromRequest(HttpServletRequest request) {
 		CommonProfile profile = null;
@@ -120,6 +123,41 @@ public class AuthUtil {
 			logger.error(ex.getMessage());
 		}
 		return response;
+	}
+
+	public static Map<String, Object> generateAccessTokenFromEmail(String email) {
+		Map<String, Object> response = new HashMap<>();
+		if ( email != null && !email.isEmpty()) {
+
+			JwtGenerator<CommonProfile> generator = new JwtGenerator<>(
+					new SecretSignatureConfiguration(PropertyFileUtil.fetchProperty(CONFIGURATION, JWT_SALT)));
+
+			Map<String, Object> jwtClaims = new HashMap<>();
+			jwtClaims.put("id", null);
+			jwtClaims.put(JwtClaims.SUBJECT, null);
+			jwtClaims.put(Pac4jConstants.USERNAME, null);
+			jwtClaims.put(CommonProfileDefinition.EMAIL, email);
+			jwtClaims.put(JwtClaims.SUBJECT, email + "");
+			jwtClaims.put(JwtClaims.EXPIRATION_TIME, JWTUtil.getRefreshTokenExpiryDate());
+			jwtClaims.put(JwtClaims.ISSUED_AT, new Date());
+			response.put("access_token", generator.generate(jwtClaims));
+		}
+
+		return response;
+
+	}
+
+	public static CommonProfile getProfileFromToken(String token) {
+		CommonProfile profile = null;
+		try {
+			JwtAuthenticator authenticator = new JwtAuthenticator();
+			authenticator.addSignatureConfiguration(
+					new SecretSignatureConfiguration(PropertyFileUtil.fetchProperty(CONFIGURATION, JWT_SALT)));
+			profile = authenticator.validateToken(token);
+		} catch (Exception ex) {
+			logger.error(ex.getMessage());
+		}
+		return profile;
 	}
 
 	private static String generateAccessToken(CommonProfile profile, User user) {
