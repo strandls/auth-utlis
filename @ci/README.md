@@ -11,6 +11,7 @@ export ARTIFACTORY_USERNAME=admin
 export ARTIFACTORY_PASSWORD=password
 export ARTIFACTORY_URL=http://venus.strandls.com/artifactory
 export MTPROP_JWTSALT=12345678901234567890123456789012
+export ARTIFACTORY_COMPAT=1
 ```
 
 ### Build commands
