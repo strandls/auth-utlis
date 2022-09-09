@@ -49,6 +49,7 @@ public class AuthUtil {
 					new SecretSignatureConfiguration(PropertyFileUtil.fetchProperty(CONFIGURATION, JWT_SALT)));
 			profile = authenticator.validateToken(token);
 		} catch (Exception ex) {
+				ex.printStackTrace();
 			logger.error(ex.getMessage());
 		}
 		return profile;
